@@ -1,34 +1,67 @@
-<h1>Wordy</h1>
-<hr>
-<div id="grid"></div>
-
+<div id="screen"> 
+  <h1>Wordy</h1>
+  <div id="grid"></div>
+  <div id="keyboard"></div>
+</div>
 <style>
-  body, html {
-    background     : white;
-    color          : white;
-    font-family    :   sans-serif;
-    text-align     :   center;
-    text-transform :   uppercase;
+  body, html, #screen {
+    background      : white;
+    color           : white;
+    font-family     :   sans-serif;
+    text-align      :   center;
+    text-transform  :   uppercase;
+    /* height          :   100vh;
+    width           :   100% */
+  }
+  #screen {
+    display         : flex;
+    flex-direction  : column;
   }
   h1 {
-    font-size      :   3em;
-    padding        :   0 0 0 0px;
-    margin         :   20px 0px 10px 0;
-    color          :   black;
+    font-size       :   2em;
+    padding         :   0 0 0 0px;
+    margin          :   20px 0px 10px 0;
+    color           :   black;
+    flex            :   none;
   }
   #grid {
-    margin-top     :   2%;
+    margin-top      :   1%;
+    flex            :   110%
   }
   .cell {
-    width          :   75px;
-    height         :   75px;
-    line-height    :   85px;
-    border         :   1px solid #aaa;
-    display        :   inline-grid;
-    place-items    :   center;
-    margin         :   2.5px;
-    font-size      :   40px;
-    font-weight    :   bold;
+    width           :   65px;
+    height          :   65px;
+    line-height     :   75px;
+    border          :   1px solid #aaa;
+    display         :   inline-grid;
+    place-items     :   center;
+    margin          :   2.5px;
+    font-size       :   35px;
+    font-weight     :   bold;
+  }
+  .key {
+    display         :   inline-grid;
+    align-items     :   center;
+    text-transform  :   uppercase;
+    padding         :   10px;
+    border-radius   :   5px;
+    /* width           :   40px; */
+    height          :   50px;
+    border          :   none;
+    margin          :   0 5px 0 5px;
+    font-size       :   14px;
+    font-weight     :   bold;
+    cursor          :   pointer;
+  }
+  .key:focus {
+    border: 10px solid blue;
+  }
+  .keyboardRow {
+    margin-top      : 10px;
+  }
+  #keyboard {
+    margin-top      : 20px;
+    display         : inline-grid;
   }
 </style>
 <script src="index.js"></script>

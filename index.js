@@ -1,5 +1,10 @@
 'use strict'
-let wordList = [
+
+let GREEN     = '#6aaa64'
+let GREY      = '#939598'
+let LIGHTGREY = '#d3d6da';
+let YELLOW    = '#c9b458'
+let wordList  = [
   'patio',
   'darts',
   'piano',
@@ -9,10 +14,13 @@ let wordList = [
   'court',
   'jesus',
   'boobs',
+  'titty',
   'otter',
   'caulk',
   'pizza',
-  'swill'
+  'swill',
+  'penis',
+  'swarm'
 ];
 
 function buildGrid() {
@@ -21,7 +29,7 @@ function buildGrid() {
     for (let j = 0; j< 5; j++) {
       let cell = document.createElement('div')
       cell.className    = 'cell'
-      cell.textContent  = ' '
+      cell.textContent  = ''
       row.appendChild(cell)
     }
     grid.appendChild(row) 
@@ -31,14 +39,16 @@ function buildGrid() {
 let randomIndex     = Math.floor(Math.random() * wordList.length)
 let secret          = wordList[randomIndex];
 let currentAttempt  = '';
-let history        = [];
-let grid = document.getElementById('grid')
+let history         = [];
+let grid            = document.getElementById('grid');
+let keyboard        = document.getElementById('keyboard');
 
 buildGrid();
+buildKeyboard();
 updateGrid();
 window.addEventListener('keydown', handleKeyDown);
 
-async function handleKeyDown(e) {
+function handleKeyDown(e) {
   if (e.ctrlKey || e.metaKey || e.altKey) {
     return;
   }
@@ -53,7 +63,7 @@ async function handleKeyDown(e) {
       return;
     }
     if (currentAttempt === secret) {
-      await updateGrid();
+      updateGrid();
       setTimeout(() => alert("WINNER"), 250);
     }
     history.push(currentAttempt);
@@ -75,6 +85,43 @@ async function handleKeyDown(e) {
   updateGrid();
 }
 
+function handleKey(key) {
+  console.log(key)
+  let letter = key.toLowerCase();
+
+  if (letter === 'enter') {
+    if (currentAttempt.length < 5) {
+      console.log("premature enter");
+    } 
+    if (!wordList.includes(currentAttempt)) {
+      alert('Not a word!');
+      return;
+    }
+    if (currentAttempt === secret) {
+      updateGrid();
+      setTimeout(() => alert("WINNER"), 250);
+    }
+    history.push(currentAttempt);
+    currentAttempt = ''
+    
+  } else if ( letter === '<-') {
+    console.log(letter);
+    currentAttempt = currentAttempt.slice(0,-1)
+    
+    
+  } else if (/^[a-z]$/.test(letter)) {
+    console.log('success')
+    if (currentAttempt.length < 5) {
+      currentAttempt += letter;
+    }
+    else{
+      console.log("not adding charcter")
+    } 
+  }
+
+  updateGrid();
+}
+
 function updateGrid() {
   let row  = grid.firstChild
   for (let attempt of history) {
@@ -82,6 +129,8 @@ function updateGrid() {
     row = row.nextSibling
   }
   drawAttempt(row, currentAttempt, true)
+  document.getElementById("enter").focus();
+  document.getElementById("enter").blur();
   // history.push(currentAttempt)
 }
 
@@ -102,7 +151,6 @@ function drawAttempt(row, attempt, isCurrent) {
       cell.style.color = 'white';
     }
   }
-  
 }
 
 function getBgColor(attempt, index) {
@@ -110,10 +158,55 @@ function getBgColor(attempt, index) {
   let attemptLetter  = attempt[index]
   if (attemptLetter === undefined) { return }
   if (correctLetter === attemptLetter) {
-    return '#6aaa64'
+    return GREEN
   }
   if (secret.indexOf(attemptLetter) === -1) {
-    return '#939598'
+    return GREY
   }
-  return '#c9b458'
+  return YELLOW
+}
+
+function buildKeyboard() {
+  buildKeyboardRow('qwertyuiop', false);
+  buildKeyboardRow('asdfghjkl', false);
+  buildKeyboardRow('zxcvbnm', true);
+}
+
+function buildKeyboardRow(letters, isLastRow) {
+  let keyboardRow = document.createElement('div')
+  keyboardRow.className = 'keyboardRow'
+  if (isLastRow) {
+    let key = document.createElement('button')
+    key.className = 'key';
+    key.id = 'enter';
+    key.textContent = 'Enter';
+    key.style.backgroundColor = LIGHTGREY;
+    key.style.fontSize = '12px';
+    key.onclick = () => {
+      handleKey(key.textContent);
+    }
+    keyboardRow.appendChild(key);  
+  }
+  for (let i = 0; i < letters.length; i++) {
+    let key = document.createElement('button')
+    key.className = 'key';
+    key.textContent = letters[i];
+    key.style.backgroundColor = LIGHTGREY;
+    key.onclick = () => {
+      console.log("clicked")
+      handleKey(key.textContent);
+    }
+    keyboardRow.appendChild(key);
+  }
+  if (isLastRow) {
+    let key = document.createElement('button')
+    key.className = 'key';
+    key.textContent = '<-';
+    key.style.backgroundColor = LIGHTGREY;
+    key.onclick = () => {
+      handleKey(key.textContent)
+    }
+    keyboardRow.appendChild(key);
+  }
+  keyboard.appendChild(keyboardRow);
 }
