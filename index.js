@@ -42,6 +42,10 @@ let currentAttempt  = '';
 let history         = [];
 let grid            = document.getElementById('grid');
 let keyboard        = document.getElementById('keyboard');
+let keyboardButtons = new Map();
+let green_buttons   = new Set();
+let yellow_buttons  = new Set();
+let grey_buttons    = new Set();
 
 buildGrid();
 buildKeyboard();
@@ -80,6 +84,7 @@ function handleKeyDown(e) {
     }
   }
   updateGrid();
+  updateKeyboard();
 }
 
 function handleKey(key) {
@@ -155,11 +160,14 @@ function getBgColor(attempt, index) {
   let attemptLetter  = attempt[index]
   if (attemptLetter === undefined) { return }
   if (correctLetter === attemptLetter) {
+    green_buttons.add(attemptLetter)
     return GREEN
   }
   if (secret.indexOf(attemptLetter) === -1) {
+    grey_buttons.add(attemptLetter)
     return GREY
   }
+  yellow_buttons.add(attemptLetter);
   return YELLOW
 }
 
@@ -193,6 +201,7 @@ function buildKeyboardRow(letters, isLastRow) {
       console.log("clicked")
       handleKey(key.textContent);
     }
+    keyboardButtons.set(letters[i], key);
     keyboardRow.appendChild(key);
   }
   if (isLastRow) {
@@ -206,4 +215,17 @@ function buildKeyboardRow(letters, isLastRow) {
     keyboardRow.appendChild(key);
   }
   keyboard.appendChild(keyboardRow);
+}
+
+function updateKeyboard() {
+  console.log("updating keyboard")
+  for (let [key, button] of keyboardButtons) {
+    if (green_buttons.has(key)) {
+      button.style.backgroundColor = GREEN;
+    } else if (yellow_buttons.has(key)) {
+      button.style.backgroundColor = YELLOW;
+    } else if (grey_buttons.has(key)) {
+      button.style.backgroundColor = GREY;
+    }
+  }
 }
