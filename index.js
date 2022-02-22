@@ -68,12 +68,9 @@ function handleKeyDown(e) {
     }
     history.push(currentAttempt);
     currentAttempt = ''
-    
   } else if ( letter === 'backspace') {
     console.log(letter);
     currentAttempt = currentAttempt.slice(0,-1)
-    
-    
   } else if (/^[a-z]$/.test(letter)) {
     if (currentAttempt.length < 5) {
       currentAttempt += letter;
