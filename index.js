@@ -3,7 +3,16 @@ let wordList = [
   'patio',
   'darts',
   'piano',
-  'raise'
+  'raise',
+  'tacit',
+  'other',
+  'court',
+  'jesus',
+  'boobs',
+  'otter',
+  'caulk',
+  'pizza',
+  'swill'
 ];
 
 function buildGrid() {
@@ -29,8 +38,12 @@ buildGrid();
 updateGrid();
 window.addEventListener('keydown', handleKeyDown);
 
-function handleKeyDown(e) {
+async function handleKeyDown(e) {
+  if (e.ctrlKey || e.metaKey || e.altKey) {
+    return;
+  }
   let letter = e.key.toLowerCase();
+
   if (letter === 'enter') {
     if (currentAttempt.length < 5) {
       console.log("premature enter");
@@ -38,6 +51,10 @@ function handleKeyDown(e) {
     if (!wordList.includes(currentAttempt)) {
       alert('Not a word!');
       return;
+    }
+    if (currentAttempt === secret) {
+      await updateGrid();
+      setTimeout(() => alert("WINNER"), 250);
     }
     history.push(currentAttempt);
     currentAttempt = ''
@@ -47,7 +64,7 @@ function handleKeyDown(e) {
     currentAttempt = currentAttempt.slice(0,-1)
     
     
-  } else if (/[a-z]/.test(letter)) {
+  } else if (/^[a-z]$/.test(letter)) {
     if (currentAttempt.length < 5) {
       currentAttempt += letter;
     }
@@ -75,6 +92,7 @@ function drawAttempt(row, attempt, isCurrent) {
       cell.textContent = attempt[i];
     } else {
       cell.innerHTML = '<div style="opacity:0">X</div>';
+      // cell.textContent = attempt[i]
     }
     if (isCurrent) {
       cell.style.backgroundColor  = 'white'
@@ -99,5 +117,3 @@ function getBgColor(attempt, index) {
   }
   return '#c9b458'
 }
-
-// document.addEventListener('click', updateGrid)
