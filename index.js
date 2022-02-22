@@ -21,12 +21,42 @@ function buildGrid() {
 
 let randomIndex     = Math.floor(Math.random() * wordList.length)
 let secret          = wordList[randomIndex];
-let currentAttempt  = 'train';
-let history        = ['plane', 'tacit', 'caulk'];
+let currentAttempt  = '';
+let history        = [];
 let grid = document.getElementById('grid')
 
 buildGrid();
 updateGrid();
+window.addEventListener('keydown', handleKeyDown);
+
+function handleKeyDown(e) {
+  let letter = e.key.toLowerCase();
+  if (letter === 'enter') {
+    if (currentAttempt.length < 5) {
+      console.log("premature enter");
+    } 
+    if (!wordList.includes(currentAttempt)) {
+      alert('Not a word!');
+      return;
+    }
+    history.push(currentAttempt);
+    currentAttempt = ''
+    
+  } else if ( letter === 'backspace') {
+    console.log(letter);
+    currentAttempt = currentAttempt.slice(0,-1)
+    
+    
+  } else if (/[a-z]/.test(letter)) {
+    if (currentAttempt.length < 5) {
+      currentAttempt += letter;
+    }
+    else{
+      console.log("not adding charcter")
+    }
+  }
+  updateGrid();
+}
 
 function updateGrid() {
   let row  = grid.firstChild
@@ -35,7 +65,7 @@ function updateGrid() {
     row = row.nextSibling
   }
   drawAttempt(row, currentAttempt, true)
-  history.push(currentAttempt)
+  // history.push(currentAttempt)
 }
 
 function drawAttempt(row, attempt, isCurrent) {
@@ -70,4 +100,4 @@ function getBgColor(attempt, index) {
   return '#c9b458'
 }
 
-document.addEventListener('click', updateGrid)
+// document.addEventListener('click', updateGrid)
