@@ -1,10 +1,12 @@
 'use strict'
 
-let GREEN     = '#6aaa64'
-let GREY      = '#939598'
-let LIGHTGREY = '#d3d6da';
-let YELLOW    = '#c9b458'
-let wordList  = [
+let BLACK       = '#666'
+let GREEN       = '#6aaa64'
+let GREY        = '#939598'
+let BORDERGREY  = '#aaa';
+let LIGHTGREY   = '#d3d6da'
+let YELLOW      = '#c9b458'
+let wordList    = [
   'patio',
   'darts',
   'piano',
@@ -47,6 +49,7 @@ let green_buttons   = new Set();
 let yellow_buttons  = new Set();
 let grey_buttons    = new Set();
 let revealedWord    = false;
+let currentRow      = 1;
 
 function handleKeyDown(e) {
   if (e.ctrlKey || e.metaKey || e.altKey) {
@@ -68,6 +71,7 @@ function handleKeyDown(e) {
     }
     history.push(currentAttempt);
     currentAttempt = ''
+    currentRow += 1
     if (history.length === 6) {
       setTimeout(() => alert(secret.toUpperCase(), 250));
     }
@@ -126,7 +130,7 @@ function handleKey(key) {
 }
 
 function updateGrid() {
-  let row  = grid.firstChild
+  let row     = grid.firstChild
   for (let attempt of history) {
     drawAttempt(row, attempt, false)
     row = row.nextSibling
@@ -145,14 +149,18 @@ function drawAttempt(row, attempt, isCurrent) {
       cell.textContent = attempt[i];
     } else {
       cell.innerHTML = '<div style="opacity:0">X</div>';
-      // cell.textContent = attempt[i]
     }
     if (isCurrent) {
+      cell.style.color            = 'black'
       cell.style.backgroundColor  = 'white'
-      cell.style.color = 'black'
+      cell.style.borderColor      = ''
+      if (attempt[i] !== undefined) {
+        cell.style.borderColor = BLACK;
+      }
     } else {
-      cell.style.backgroundColor  = getBgColor(attempt, i)
-      cell.style.color = 'white';
+      cell.style.color            = 'white';
+      cell.style.backgroundColor  = getBgColor(attempt, i)      
+      cell.style.borderColor      = getBgColor(attempt, i)
     }
   }
 }
@@ -208,7 +216,8 @@ function buildKeyboardRow(letters, isLastRow) {
   }
   if (isLastRow) {
     let key = document.createElement('button')
-    key.className = 'key';
+    key.id          = 'backspace'
+    key.className   = 'key';
     key.textContent = '<-';
     key.style.backgroundColor = LIGHTGREY;
     key.onclick = () => {
