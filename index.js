@@ -36,8 +36,8 @@ function buildGrid() {
   }
 }
 
-let randomIndex     = Math.floor(Math.random() * wordList.length)
-let secret          = wordList[randomIndex];
+// let randomIndex     = Math.floor(Math.random() * wordList.length)
+let secret          = wordList[1];
 let currentAttempt  = '';
 let history         = [];
 let grid            = document.getElementById('grid');
@@ -46,11 +46,7 @@ let keyboardButtons = new Map();
 let green_buttons   = new Set();
 let yellow_buttons  = new Set();
 let grey_buttons    = new Set();
-
-buildGrid();
-buildKeyboard();
-updateGrid();
-window.addEventListener('keydown', handleKeyDown);
+let revealedWord    = false;
 
 function handleKeyDown(e) {
   if (e.ctrlKey || e.metaKey || e.altKey) {
@@ -72,6 +68,9 @@ function handleKeyDown(e) {
     }
     history.push(currentAttempt);
     currentAttempt = ''
+    if (history.length === 6) {
+      setTimeout(() => alert(secret.toUpperCase(), 250));
+    }
   } else if ( letter === 'backspace') {
     console.log(letter);
     currentAttempt = currentAttempt.slice(0,-1)
@@ -90,7 +89,9 @@ function handleKeyDown(e) {
 function handleKey(key) {
   console.log(key)
   let letter = key.toLowerCase();
-
+  if (history.length === 6) {
+    return
+  }
   if (letter === 'enter') {
     if (currentAttempt.length < 5) {
       console.log("premature enter");
@@ -133,6 +134,7 @@ function updateGrid() {
   drawAttempt(row, currentAttempt, true)
   document.getElementById("enter").focus();
   document.getElementById("enter").blur();
+  // saveGame();
   // history.push(currentAttempt)
 }
 
@@ -229,3 +231,31 @@ function updateKeyboard() {
     }
   }
 }
+
+function loadGame() {
+  let data
+  try {
+    data = JSON.parse(localStorage.getItem('data'));
+  } catch {}
+  if (data !== null) {
+    if (data.secret === secret) {
+      history = data.history
+    }
+  }
+}
+
+function saveGame() {
+  let data = JSON.stringify({
+    secret,
+    history
+  })
+  try {
+    localStorage.setItem('data', data) 
+  } catch { 
+  }
+}
+loadGame();
+buildGrid();
+buildKeyboard();
+updateGrid();
+window.addEventListener('keydown', handleKeyDown);
