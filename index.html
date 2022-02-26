@@ -33,13 +33,43 @@
     width           :   60px;
     height          :   60px;
     line-height     :   67px;
-    border          :   1.5px solid #aaa;
     display         :   inline-grid;
     place-items     :   center;
     margin          :   2.5px;
     font-size       :   35px;
     font-weight     :   bold;
   }
+  .cell > .front, .cell > .back {
+    border          :   1.5px solid #aaa;
+  }
+  .cell > .front {
+    display         :   block;
+    width           :   60px;
+    height          :   60px;
+    line-height     :   67px;
+    place-items     :   center;
+    margin          :   2.5px;
+    font-size       :   35px;
+    font-weight     :   bold;
+  }
+  .cell > .back {
+    display         : none;
+  }
+  .cell.current > .front {
+    display         : none;
+  }
+  .cell.current > .back {
+    display         :   block;
+    width           :   60px;
+    height          :   60px;
+    line-height     :   67px;
+    place-items     :   center;
+    margin          :   2.5px;
+    font-size       :   35px;
+    font-weight     :   bold;
+
+  }
+
   .key {
     display         :   inline-grid;
     align-items     :   center;
@@ -77,6 +107,18 @@
     to {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  @keyframes flip {
+    from {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
     }
   }
 

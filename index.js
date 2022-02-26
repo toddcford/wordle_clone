@@ -31,7 +31,12 @@ function buildGrid() {
     for (let j = 0; j< 5; j++) {
       let cell = document.createElement('div')
       cell.className    = 'cell'
-      cell.textContent  = ''
+      let front = document.createElement('div')
+      front.className   ='front'
+      let back  = document.createElement('div');
+      back.className    ='back';
+      cell.appendChild(front)
+      cell.appendChild(back)
       row.appendChild(cell)
     }
     grid.appendChild(row) 
@@ -49,7 +54,7 @@ let green_buttons   = new Set();
 let yellow_buttons  = new Set();
 let grey_buttons    = new Set();
 let revealedWord    = false;
-let currentRow      = 1;
+// let currentRow      = 1;
 
 function handleKeyDown(e) {
   if (e.ctrlKey || e.metaKey || e.altKey) {
@@ -69,16 +74,28 @@ function handleKeyDown(e) {
       updateGrid();
       setTimeout(() => alert("WINNER"), 250);
     }
-    history.push(currentAttempt);
+    
+    history.push(currentAttempt); 
+    updateKeyboard();
     currentAttempt = ''
-    currentRow += 1
+    
+    
     if (history.length === 6) {
       setTimeout(() => alert(secret.toUpperCase(), 250));
     }
   } else if ( letter === 'backspace') {
-    console.log(letter);
+    let guess_history = ''
+    for (let guess of history) {
+      guess_history += guess;
+    }
+    if (!guess_history.includes(currentAttempt.charAt(currentAttempt.length-1))) {
+      grey_buttons.delete(currentAttempt.charAt(currentAttempt.length-1))
+      green_buttons.delete(currentAttempt.charAt(currentAttempt.length-1))
+      yellow_buttons.delete(currentAttempt.charAt(currentAttempt.length-1))
+    }
+
     currentAttempt = currentAttempt.slice(0,-1)
-    clearAnimation
+    // clearAnimation()
   } else if (/^[a-z]$/.test(letter)) {
     if (currentAttempt.length < 5) {
       currentAttempt += letter;
@@ -87,7 +104,6 @@ function handleKeyDown(e) {
     
   }
   updateGrid();
-  updateKeyboard();
 }
 
 function handleKey(key) {
@@ -104,6 +120,7 @@ function handleKey(key) {
       alert('Not a word!');
       return;
     }
+    
     if (currentAttempt === secret) {
       updateGrid();
       setTimeout(() => alert("WINNER"), 250);
@@ -130,40 +147,52 @@ function handleKey(key) {
 }
 
 function updateGrid() {
-  let row     = grid.firstChild
-  for (let attempt of history) {
-    drawAttempt(row, attempt, false)
-    row = row.nextSibling
+
+  for (let i =0; i < 6; i++) {
+    let row =grid.children[i]
+    if (i < history.length) {
+      drawAttempt(row, history[i], true)
+    } else if (i === history.length) {
+      drawAttempt(row, currentAttempt, false)
+    } else {
+      drawAttempt(row, '', false);
+    }
   }
-  drawAttempt(row, currentAttempt, true)
   document.getElementById("enter").focus();
   document.getElementById("enter").blur();
   // saveGame();
-  // history.push(currentAttempt)
+  
 }
 
 function drawAttempt(row, attempt, isCurrent) {
   for (let i=0; i < 5; i++) {
     let cell = row.children[i];
+    let front = cell.children[0];
+    let back  = cell.children[1];
     if (attempt[i] !== undefined) {
-      cell.textContent = attempt[i];
+      front.textContent = attempt[i];
+      back.textContent = attempt[i];
     } else {
-      cell.innerHTML = '<div style="opacity:0">X</div>';
+      front.innerHTML = '<div style="opacity:0">X</div>';
+      back.innerHTML = '<div style="opacity:0">X</div>';
       clearAnimation(cell); 
     }
+    front.style.color             = 'black'    
+    front.style.backgroundColor   = 'white'
+    front.style.borderColor       = '' 
+    if (attempt[i] !== undefined) {
+      front.style.borderColor = BLACK;      
+    }
+    back.style.backgroundColor = getBgColor(attempt, i)
+    back.style.borderColor     = getBgColor(attempt, i)
+
     if (isCurrent) {
-      cell.style.color            = 'black'
-      cell.style.backgroundColor  = 'white'
-      cell.style.borderColor      = ''
-      if (attempt[i] !== undefined) {
-        cell.style.borderColor = BLACK;
-      }
+      cell.classList.add('current')
     } else {
-      cell.style.color            = 'white';
-      cell.style.backgroundColor  = getBgColor(attempt, i)      
-      cell.style.borderColor      = getBgColor(attempt, i)
+      cell.classList.remove('current')
     }
   }
+
 }
 
 function getBgColor(attempt, index) {
@@ -254,8 +283,10 @@ function animatePress(index) {
 function clearAnimation(cell) {
   cell.style.animationName      = ''
   cell.style.animationDuration  = '' 
-  cell.style.animationTimingFunction  = '' 
+  cell.style.animationTimingFunction  = ''
 }
+
+
 
 function loadGame() {
   let data
