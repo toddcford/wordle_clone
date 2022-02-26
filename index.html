@@ -64,5 +64,21 @@
   #enter, #backspace {
     width           : 60px;
   }
+
+  @keyframes press {
+    from  {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
 </style>
 <script src="index.js"></script>

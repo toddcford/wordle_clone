@@ -78,13 +78,13 @@ function handleKeyDown(e) {
   } else if ( letter === 'backspace') {
     console.log(letter);
     currentAttempt = currentAttempt.slice(0,-1)
+    clearAnimation
   } else if (/^[a-z]$/.test(letter)) {
     if (currentAttempt.length < 5) {
       currentAttempt += letter;
+      animatePress(currentAttempt.length - 1)
     }
-    else{
-      console.log("not adding charcter")
-    }
+    
   }
   updateGrid();
   updateKeyboard();
@@ -149,6 +149,7 @@ function drawAttempt(row, attempt, isCurrent) {
       cell.textContent = attempt[i];
     } else {
       cell.innerHTML = '<div style="opacity:0">X</div>';
+      clearAnimation(cell); 
     }
     if (isCurrent) {
       cell.style.color            = 'black'
@@ -239,6 +240,21 @@ function updateKeyboard() {
       button.style.backgroundColor = GREY;
     }
   }
+}
+
+function animatePress(index) {
+  let rowIndex  = history.length
+  let row       = grid.children[rowIndex]
+  let cell      = row.children[index]
+  cell.style.animationName      = 'press'
+  cell.style.animationDuration  = '.1s'
+  cell.style.animationTimingFunction  = 'ease-out' 
+}
+
+function clearAnimation(cell) {
+  cell.style.animationName      = ''
+  cell.style.animationDuration  = '' 
+  cell.style.animationTimingFunction  = '' 
 }
 
 function loadGame() {
