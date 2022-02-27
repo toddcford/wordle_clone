@@ -35,40 +35,62 @@
     line-height     :   67px;
     display         :   inline-grid;
     place-items     :   center;
-    margin          :   2.5px;
+    margin          :   5px;
     font-size       :   35px;
     font-weight     :   bold;
+    position        :   relative;
+    perspective     :   1000px;
   }
-  .cell > .front, .cell > .back {
+  .cell .front, .cell .back {
     border          :   1.5px solid #aaa;
-  }
-  .cell > .front {
-    display         :   block;
-    width           :   60px;
-    height          :   60px;
-    line-height     :   67px;
-    place-items     :   center;
-    margin          :   2.5px;
-    font-size       :   35px;
-    font-weight     :   bold;
-  }
-  .cell > .back {
-    display         : none;
-  }
-  .cell.current > .front {
-    display         : none;
-  }
-  .cell.current > .back {
-    display         :   block;
-    width           :   60px;
-    height          :   60px;
-    line-height     :   67px;
-    place-items     :   center;
-    margin          :   2.5px;
-    font-size       :   35px;
-    font-weight     :   bold;
+    backface-visibility: hidden;
+    position        : absolute;
+    top             : 0;
+    left            : 0;
+    bottom          : 0;
+    right           : 0;
 
   }
+  .cell.current  .surface {
+    transform       : rotateX(180deg);
+  }
+  .cell .surface {
+    transition      : 800ms;
+    transform-style : preserve-3d;
+    position        : relative;
+    width           : 100%;
+    height          : 100%;
+  }
+  .cell .front {
+    display         :   block;
+    width           :   60px;
+    height          :   60px;
+    line-height     :   67px;
+    place-items     :   center;
+    /* margin          :   2.5px; */
+    font-size       :   35px;
+    font-weight     :   bold;
+    z-index         :   2;
+
+  }
+  .cell .back {
+    z-index         :   1;
+    transform       :   rotateX(180deg);
+  }
+
+  .cell.current .front {
+    display         : none;
+  }
+  .cell.current .back {
+    display         :   block;
+    width           :   60px;
+    height          :   60px;
+    line-height     :   67px;
+    place-items     :   center;
+    /* margin          :   0 2.5 0 2.5; */
+    font-size       :   35px;
+    font-weight     :   bold;
+  }  
 
   .key {
     display         :   inline-grid;

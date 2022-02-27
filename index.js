@@ -25,6 +25,15 @@ let wordList    = [
   'swarm'
 ];
 
+let isAnimating = false;
+function pauseInput() {
+  if (isAnimating) { throw Error('shoudl never happen') }
+  isAnimating = true;
+  setTimeout(() => {
+    isAnimating = false;
+  }, 2100)
+  
+}
 function buildGrid() {
   for (let i = 0; i < 6; i++) {
     let row = document.createElement('div')
@@ -35,16 +44,20 @@ function buildGrid() {
       front.className   ='front'
       let back  = document.createElement('div');
       back.className    ='back';
-      cell.appendChild(front)
-      cell.appendChild(back)
+      let surface = document.createElement('div')
+      surface.className = 'surface'
+      surface.style.transitionDelay = j * 300 + 'ms'
+      surface.appendChild(front)
+      surface.appendChild(back);
+      cell.append(surface)
       row.appendChild(cell)
     }
     grid.appendChild(row) 
   }
 }
 
-// let randomIndex     = Math.floor(Math.random() * wordList.length)
-let secret          = wordList[1];
+let randomIndex     = Math.floor(Math.random() * wordList.length)
+let secret          = wordList[randomIndex];
 let currentAttempt  = '';
 let history         = [];
 let grid            = document.getElementById('grid');
@@ -54,10 +67,12 @@ let green_buttons   = new Set();
 let yellow_buttons  = new Set();
 let grey_buttons    = new Set();
 let revealedWord    = false;
-// let currentRow      = 1;
 
 function handleKeyDown(e) {
   if (e.ctrlKey || e.metaKey || e.altKey) {
+    return;
+  }
+  if (isAnimating) {
     return;
   }
   let letter = e.key.toLowerCase();
@@ -72,13 +87,15 @@ function handleKeyDown(e) {
     }
     if (currentAttempt === secret) {
       updateGrid();
-      setTimeout(() => alert("WINNER"), 250);
+      setTimeout(() => alert("WINNER"), 2100);
     }
     
     history.push(currentAttempt); 
-    updateKeyboard();
     currentAttempt = ''
-    
+    pauseInput()
+    setTimeout(() => {
+      updateKeyboard();
+    }, 2000)
     
     if (history.length === 6) {
       setTimeout(() => alert(secret.toUpperCase(), 250));
@@ -95,13 +112,11 @@ function handleKeyDown(e) {
     }
 
     currentAttempt = currentAttempt.slice(0,-1)
-    // clearAnimation()
   } else if (/^[a-z]$/.test(letter)) {
     if (currentAttempt.length < 5) {
       currentAttempt += letter;
       animatePress(currentAttempt.length - 1)
     }
-    
   }
   updateGrid();
 }
@@ -167,8 +182,9 @@ function updateGrid() {
 function drawAttempt(row, attempt, isCurrent) {
   for (let i=0; i < 5; i++) {
     let cell = row.children[i];
-    let front = cell.children[0];
-    let back  = cell.children[1];
+    let surface = cell.firstChild
+    let front = surface.children[0];
+    let back  = surface.children[1];
     if (attempt[i] !== undefined) {
       front.textContent = attempt[i];
       back.textContent = attempt[i];
