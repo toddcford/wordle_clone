@@ -1,5 +1,6 @@
 
-import { useState, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react'
+import { KeyContext } from './context'
 let BLACK       = '#666'
 let GREEN       = '#6aaa64'
 let GREY        = '#939598'
@@ -20,9 +21,6 @@ let wordList = [
 ]
 
 let secret          = wordList[0]
-// let history         = ['piano', 'horse', 'toddf']
-// let currentAttempt  ='wat'
-
 
 export default function Wordle() {
   let [history, setHistory] = useState([])
@@ -79,9 +77,11 @@ export default function Wordle() {
   })  
   return (
     <div id="screen">
-      <h1>Wordy</h1>
-      <Grid history={history} currentAttempt={currentAttempt} />
-      <Keyboard onKey={handleKey}/>
+      <KeyContext.Provider value={handleKey}>
+        <h1>Wordy</h1>
+        <Grid history={history} currentAttempt={currentAttempt} />
+        <Keyboard onKey={handleKey}/>
+      </KeyContext.Provider>
     </div>
   )
 }
@@ -162,23 +162,23 @@ function Cell({letter, attempt, index, solved}) {
 function Keyboard({ onKey }) {
   return (
     <div id="keyboard">
-      <KeyboardRow letters={"qwertyuiop"} onKey={onKey}  isLast={false}/>
-      <KeyboardRow letters={"asdfghjkl"} onKey={onKey} isLast={false}/>
-      <KeyboardRow letters={"zxcvbnm"} onKey={onKey} isLast={true}/>
+      <KeyboardRow letters={"qwertyuiop"}  isLast={false}/>
+      <KeyboardRow letters={"asdfghjkl"}  isLast={false}/>
+      <KeyboardRow letters={"zxcvbnm"}  isLast={true}/>
     </div>
   );
 }
 
-function KeyboardRow( { letters, onKey, isLast }) {
+function KeyboardRow( { letters, isLast }) {
   let buttons = []
   if (isLast) {
-    buttons.push(<Button key="enter" onKey={onKey} buttonKey="Enter"> Enter </Button>)
+    buttons.push(<Button key="enter" buttonKey="Enter"> Enter </Button>)
   }
   for (let letter of letters) {
-    buttons.push(<Button key={letter} onKey={onKey} buttonKey={letter}> { letter } </Button>)
+    buttons.push(<Button key={letter} buttonKey={letter}> { letter } </Button>)
   }
   if (isLast) {
-    buttons.push(<Button key="backspace" onKey={onKey} buttonKey="Backspace"> Back </Button>)
+    buttons.push(<Button key="backspace" buttonKey="Backspace"> Back </Button>)
   }
   return (
     <div className="keyboardRow">
@@ -187,7 +187,8 @@ function KeyboardRow( { letters, onKey, isLast }) {
   )
 }
 
-function Button({ buttonKey, onKey, children }) {
+function Button({ buttonKey, children }) {
+  const handleKey  = useContext(KeyContext)
   return (
     <button className="button"
             id={buttonKey}
@@ -195,7 +196,7 @@ function Button({ buttonKey, onKey, children }) {
               backgroundColor: LIGHTGREY
             }}
             onClick={() => {
-              onKey(buttonKey)
+              handleKey(buttonKey)
             }}
     > {children} </button>
   )
