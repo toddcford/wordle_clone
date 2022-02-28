@@ -92,14 +92,14 @@
     font-weight     :   bold;
   }  
 
-  .key {
+  .button {
     display         :   inline-grid;
     align-items     :   center;
     text-transform  :   uppercase;
     padding         :   10px;
     border-radius   :   5px;
     width           :   44px;
-    height          :   57px;
+    height          :   58px;
     border          :   none;
     margin          :   0 2.5px 0 2.5px;
     font-size       :   14px;
