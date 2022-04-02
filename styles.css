@@ -40,6 +40,9 @@
     font-size       :   35px;
     font-weight     :   bold;
     position        :   relative;
+    animation-name  :   press;
+    animation-duration: .1s;
+    animation-timing-function: ease-out;
     perspective     :   1000px;
   }
   .cell .front, .cell .back {
@@ -105,6 +108,7 @@
     font-size       :   14px;
     font-weight     :   bold;
     cursor          :   pointer;
+    text-align      :   center;
   }
   .keyboardRow {
     margin-top      :   7.5px;
@@ -115,7 +119,8 @@
     color           : black;
   }
   #enter, #backspace {
-    width           :   60px;
+    width           :   70px;
+    text-align      :   center;
   }
 
   @keyframes press {
