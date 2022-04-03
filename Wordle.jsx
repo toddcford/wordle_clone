@@ -27,35 +27,40 @@ export default function Wordle() {
   let [history, setHistory] = useState([])
   let [currentAttempt, setCurrentAttempt] = useState('')
   let [bestColors, setBestColors] = useState(() => new Map())
-  // let [isAnimating, setIsAnimating] = useState(false)
+  let [isAnimating, setIsAnimating] = useState(false)
   let loadedRef = useRef(false)
 
-  // useEffect(() => {
-  //   if (loadedRef.current) {
-  //     console.log(currentAttempt)
-  //     return
-  //   }
-  //   loadedRef.current = true
-  //   let savedHistory = loadHistory()
-  //   console.log("saved history: ", savedHistory)
-  //   if (savedHistory) {
-  //     setHistory(savedHistory)
-  //   }
-  //   console.log("history state: ", history)
-  // })
-  
-  // useEffect(() => {
-  //   console.log("saving this history: ", history)
-  //   saveHistory(history)
-  // }, [history])
+  useEffect(() => {
+    if (loadedRef.current) {
+       return
+    }
+    loadedRef.current = true
+    let savedHistory = loadHistory()
+    if (savedHistory) {
+      setHistory(savedHistory)
+    }
+  })
+
+  useEffect(() => {
+    
+    if (history[history.length-1] === secret || history.length == 6) {
+
+      console.log("clearing storage")
+      saveHistory([])
+    }
+    else {
+      saveHistory(history)
+    }
+    
+  }, [history])
 
   function handleKeyDown(e) {
     if (e.ctrlKey || e.metaKey || e.altKey) {
       return;
     }
-    // if (isAnimating) {
-    //   return;
-    // }
+    if (isAnimating) {
+      return;
+    }
     handleKey(e.key.toLowerCase())
   }
   
@@ -72,14 +77,17 @@ export default function Wordle() {
         return;
       }
       if (history.length === 5 && currentAttempt != secret) {
-        saveHistory(newHistory)
-        setTimeout(() => alert(secret.toUpperCase()), 2100);
+        let newHistory = [...history, currentAttempt]
+        console.log("GAME OVER")
+        setHistory(newHistory)
+        setTimeout(() => alert(secret.toUpperCase()), 2100);        
         return
       }
       if (currentAttempt === secret) {
         let newHistory = [...history, currentAttempt]
         setBestColors(calculateBestColors(newHistory))
         setHistory(newHistory)
+        saveHistory([])
         setCurrentAttempt('')
         setTimeout(() => alert("WINNER"), 2100);
 
@@ -90,7 +98,7 @@ export default function Wordle() {
       setCurrentAttempt('')
       saveHistory(newHistory)
       //TODO: pauseInput()
-      setBestColors(calculateBestColors(newHistory))
+      setTimeout(() => setBestColors(calculateBestColors(newHistory), 2100))
       
     } else if ( letter === 'backspace') {
       setCurrentAttempt(currentAttempt.slice(0,-1))
@@ -100,7 +108,6 @@ export default function Wordle() {
         console.log("setting current attempt")
         console.log("history: ", history)
         setCurrentAttempt(currentAttempt + letter)
-        // animatePress(currentAttempt.length - 1)
       }
     }    
   }
@@ -166,8 +173,29 @@ function Cell({letter, attempt, index, solved}) {
   } else {
     content = <div style={{opacity: 0}}>X</div>
   }
+
+  let cellRef = useRef(null)
+  let prevHasLetterRef = useRef(null)
+  useEffect(() => {
+    let prevHasLetter = prevHasLetterRef.current 
+    let didFlip  = hasLetter !== prevHasLetter
+    let isLoad = prevHasLetter === null
+    if ( !isLoad && didFlip) {
+      let cell = cellRef.current
+      if (hasLetter) {
+        animatePress(cell) 
+      } else {
+        clearAnimation(cell)
+      }
+    }
+    prevHasLetterRef.current  = hasLetter
+  })
+
   return (
-    <div className={"cell " + (solved ? "solved" : "")}>
+    <div 
+    ref={cellRef}
+    className={"cell " + (solved ? "solved" : "")}
+    >
       <div className="surface" style={{
         transitionDelay: (index * 300) + "ms"
       }}>
@@ -286,7 +314,7 @@ function saveHistory(history) {
   })
   try {
     localStorage.setItem('data', data) 
-    console.log("saving historys")
+    console.log("saving history")
   } catch { 
     console.log("failed to save history")
   }
@@ -315,4 +343,17 @@ function getBetterColor(a, b) {
   }
 
   return GREY
+}
+
+function animatePress(cell) {
+  console.log("animating press")
+  cell.style.animationName      = 'press'
+  cell.style.animationDuration  = '.1s'
+  cell.style.animationTimingFunction  = 'ease-out' 
+}
+function clearAnimation(cell) {
+  console.log("clearing animation")
+  cell.style.animationName      = ''
+  cell.style.animationDuration  = '' 
+  cell.style.animationTimingFunction  = ''
 }

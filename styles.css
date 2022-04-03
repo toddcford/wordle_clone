@@ -40,9 +40,6 @@
     font-size       :   35px;
     font-weight     :   bold;
     position        :   relative;
-    animation-name  :   press;
-    animation-duration: .1s;
-    animation-timing-function: ease-out;
     perspective     :   1000px;
   }
   .cell .front, .cell .back {
